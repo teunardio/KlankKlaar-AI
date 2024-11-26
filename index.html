@@ -103,106 +103,124 @@
     </div>
   </div>
 
-  <script>
-    const tracks = [
-  { title: "Christmas Cheers (Raise Your Glass)", file: "Christmas Cheers (Raise Your Glass).mp3" },
-  { title: "Maarten's Christmas Lights", file: "Maarten's Christmas Lights.mp3" },
-  { title: "Christmas in Old Kampen", file: "Christmas in Old Kampen.mp3" },
-  { title: "Xmas at Slijterij Post", file: "Xmas at Slijterij Post.mp3" },
-  { title: "Winter Storms", file: "Winter Storms.mp3" },
-  { title: "Across the frozen IJssel", file: "Accross the frozen IJssel.mp3" },
-  { title: "Drunk at the Christmas Market", file: "Drunk at the Christmas Market.mp3" },
-  { title: "Whisky Dreams", file: "Whisky Dreams.mp3" },
-  { title: "Magic Beers", file: "Magic Beers.mp3" },
-  { title: "Wine & Riffs", file: "Wine & Riffs.mp3" },
-  { title: "From the Barn to the Kettle", file: "From the Barn to the Kettle.mp3" },
-  { title: "(D)rum", file: "(D)rum.mp3" },
-  { title: "Winter Cheer", file: "Winter Cheer.mp3" },
-  { title: "Santa's Liquor Run", file: "Santa's Liquor Run.mp3" },
-  { title: "Christmas Waltz with You", file: "Christmas Waltz with You.mp3" }
-];
-
-let currentTrack = 0;
-let shuffle = false;
-
-const audioPlayer = document.getElementById('audio-player');
-const trackTitle = document.getElementById('track-title');
-const shuffleStatus = document.getElementById('shuffle-status');
-
-// Update the page title dynamically
-function updatePageTitle(title) {
-  document.title = `${title} - KlankKlaar AI`;
-}
-
-// Update Media Session metadata for lock screen and control center
-if ('mediaSession' in navigator) {
-  function updateMediaSessionMetadata(track) {
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: track.title,
-      artist: "KlankKlaar AI",
-      album: "Jouw persoonlijke radiostation",
-      artwork: [
-        { src: "cover.png", sizes: "300x300", type: "image/png" },
-        { src: "cover.png", sizes: "512x512", type: "image/png" }
-      ]
-    });
-
-    // Set action handlers for media controls
-    navigator.mediaSession.setActionHandler('play', () => audioPlayer.play());
-    navigator.mediaSession.setActionHandler('pause', () => audioPlayer.pause());
-    navigator.mediaSession.setActionHandler('previoustrack', playPrevious);
-    navigator.mediaSession.setActionHandler('nexttrack', playNext);
+  <script>const tracks = [
+    { title: "Christmas Cheers (Raise Your Glass)", file: "Christmas Cheers (Raise Your Glass).mp3" },
+    { title: "Maarten's Christmas Lights", file: "Maarten's Christmas Lights.mp3" },
+    { title: "Christmas in Old Kampen", file: "Christmas in Old Kampen.mp3" },
+    { title: "Xmas at Slijterij Post", file: "Xmas at Slijterij Post.mp3" },
+    { title: "Winter Storms", file: "Winter Storms.mp3" },
+    { title: "Across the frozen IJssel", file: "Accross the frozen IJssel.mp3" },
+    { title: "Drunk at the Christmas Market", file: "Drunk at the Christmas Market.mp3" },
+    { title: "Whisky Dreams", file: "Whisky Dreams.mp3" },
+    { title: "Magic Beers", file: "Magic Beers.mp3" },
+    { title: "Wine & Riffs", file: "Wine & Riffs.mp3" },
+    { title: "From the Barn to the Kettle", file: "From the Barn to the Kettle.mp3" },
+    { title: "(D)rum", file: "(D)rum.mp3" },
+    { title: "Winter Cheer", file: "Winter Cheer.mp3" },
+    { title: "Santa's Liquor Run", file: "Santa's Liquor Run.mp3" },
+    { title: "Christmas Waltz with You", file: "Christmas Waltz with You.mp3" }
+  ];
+  
+  let currentTrack = 0;
+  let shuffle = false;
+  
+  const audioPlayer = document.getElementById('audio-player');
+  const trackTitle = document.getElementById('track-title');
+  const albumCover = document.getElementById('album-cover');
+  const shuffleStatus = document.getElementById('shuffle-status');
+  
+  // Function to get the album art for a given track
+  function getAlbumArt(track) {
+    const jpegCover = track.file.replace('.mp3', '.jpeg');
+    return jpegCover; // By default, use the .jpeg with the same filename
   }
-}
-
-// Load a track and update metadata
-function loadTrack(index) {
-  const current = tracks[index];
-  currentTrack = index;
-  trackTitle.textContent = current.title;
-  audioPlayer.src = current.file;
-  updatePageTitle(current.title); // Update the page title
+  
+  // Update the page title dynamically
+  function updatePageTitle(title) {
+    document.title = `${title} - KlankKlaar AI`;
+  }
+  
+  // Update Media Session metadata for lock screen and control center
   if ('mediaSession' in navigator) {
-    updateMediaSessionMetadata(current); // Update lock screen metadata
+    function updateMediaSessionMetadata(track) {
+      const albumArt = getAlbumArt(track);
+      navigator.mediaSession.metadata = new MediaMetadata({
+        title: track.title,
+        artist: "KlankKlaar AI",
+        album: "Jouw persoonlijke radiostation",
+        artwork: [
+          { src: albumArt, sizes: "300x300", type: "image/jpeg" },
+          { src: albumArt, sizes: "512x512", type: "image/jpeg" }
+        ]
+      });
+  
+      // Set action handlers for media controls
+      navigator.mediaSession.setActionHandler('play', () => audioPlayer.play());
+      navigator.mediaSession.setActionHandler('pause', () => audioPlayer.pause());
+      navigator.mediaSession.setActionHandler('previoustrack', playPrevious);
+      navigator.mediaSession.setActionHandler('nexttrack', playNext);
+    }
   }
-  audioPlayer.play();
-}
-
-// Play the previous track
-function playPrevious() {
-  if (currentTrack > 0) {
-    loadTrack(currentTrack - 1);
-  } else {
-    loadTrack(tracks.length - 1); // Loop to the last track
+  
+  // Load a track and update metadata
+  function loadTrack(index) {
+    const current = tracks[index];
+    currentTrack = index;
+  
+    // Update UI
+    trackTitle.textContent = current.title;
+    audioPlayer.src = current.file;
+  
+    // Update album cover dynamically
+    const albumArt = getAlbumArt(current);
+    albumCover.src = albumArt;
+    albumCover.onerror = () => {
+      // Fallback to cover.png if album art is not available
+      albumCover.src = "cover.png";
+    };
+  
+    updatePageTitle(current.title); // Update the page title
+    if ('mediaSession' in navigator) {
+      updateMediaSessionMetadata(current); // Update lock screen metadata
+    }
+    audioPlayer.play();
   }
-}
-
-// Play the next track
-function playNext() {
-  const nextTrack = shuffle
-    ? Math.floor(Math.random() * tracks.length)
-    : (currentTrack + 1) % tracks.length;
-  loadTrack(nextTrack);
-}
-
-// Toggle shuffle mode
-function toggleShuffle() {
-  shuffle = !shuffle;
-  shuffleStatus.textContent = shuffle ? "Aan" : "Uit";
-}
-
-// Automatically play the next track when the current one ends
-audioPlayer.addEventListener('ended', playNext);
-
-// Update track title on iPhone (or other devices) when the audio is loaded
-audioPlayer.addEventListener('canplay', () => {
-  const current = tracks[currentTrack];
-  trackTitle.textContent = current.title;
-  updatePageTitle(current.title); // Sync the page title with the current track
-});
-
-// Load the first track on page load
-loadTrack(0);
+  
+  // Play the previous track
+  function playPrevious() {
+    if (currentTrack > 0) {
+      loadTrack(currentTrack - 1);
+    } else {
+      loadTrack(tracks.length - 1); // Loop to the last track
+    }
+  }
+  
+  // Play the next track
+  function playNext() {
+    const nextTrack = shuffle
+      ? Math.floor(Math.random() * tracks.length)
+      : (currentTrack + 1) % tracks.length;
+    loadTrack(nextTrack);
+  }
+  
+  // Toggle shuffle mode
+  function toggleShuffle() {
+    shuffle = !shuffle;
+    shuffleStatus.textContent = shuffle ? "Aan" : "Uit";
+  }
+  
+  // Automatically play the next track when the current one ends
+  audioPlayer.addEventListener('ended', playNext);
+  
+  // Update track title on iPhone (or other devices) when the audio is loaded
+  audioPlayer.addEventListener('canplay', () => {
+    const current = tracks[currentTrack];
+    trackTitle.textContent = current.title;
+    updatePageTitle(current.title); // Sync the page title with the current track
+  });
+  
+  // Load the first track on page load
+  loadTrack(0);
   </script>
 </body>
 </html>
