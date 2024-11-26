@@ -49,6 +49,12 @@
       display: block;
       border-radius: 10px;
     }
+    audio {
+      width: 100%;
+      max-width: 450px;
+      margin: 20px auto;
+      display: block; /* Ensure the audio element is visible */
+    }
     button {
       margin: 10px;
       padding: 10px 20px;
@@ -65,12 +71,6 @@
     button:hover {
       transform: scale(1.1);
       box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
-    }
-    #info-text {
-      margin-top: 30px;
-      font-size: 1rem;
-      line-height: 1.5;
-      padding: 0 20px;
     }
     .shuffle-toggle {
       font-size: 0.9rem;
@@ -96,12 +96,6 @@
         <button onclick="playNext()">Volgende</button>
       </div>
       <p class="shuffle-toggle" onclick="toggleShuffle()">Shuffle: <span id="shuffle-status">Uit</span></p>
-      <p id="info-text">
-        Alsjeblieft Maarten,<br><br>
-        Jouw persoonlijke radiostation voor deze koude decembermaand. Wanneer je de muziek zat bent, neem dan contact op met ons, kunnen we kijken naar nieuwe songs.<br><br>
-        Fijne feestdagen!<br>
-        Cheers, Marit en Teunard
-      </p>
     </div>
   </div>
 <script>
