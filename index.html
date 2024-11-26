@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KlankKlaar AI</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    audio { width: 100%; margin-top: 20px; }
+    button { margin: 5px; padding: 10px 20px; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h1>KlankKlaar AI - Music Player</h1>
+  <div>
+    <p id="track-title">No track playing</p>
+    <audio id="audio-player" controls></audio>
+    <div>
+      <button onclick="playPrevious()">Previous</button>
+      <button onclick="playNext()">Next</button>
+    </div>
+  </div>
+
+  <script>
+    const tracks = [
+      { title: "Christmas Cheers (Raise Your Glass)", file: "Christmas Cheers (Raise Your Glass).mp3" },
+      { title: "Maarten's Christmas Lights", file: "Maarten's Christmas Lights.mp3" },
+      { title: "Christmas in Old Kampen", file: "Christmas in Old Kampen.mp3" },
+      { title: "Xmas at Slijterij Post", file: "Xmas at Slijterij Post.mp3" },
+      { title: "Winter Storms", file: "Winter Storms.mp3" },
+      { title: "Across the frozen IJssel", file: "Accross the frozen IJssel.mp3" },
+      { title: "Drunk at the Christmas Market", file: "Drunk at the Christmas Market.mp3" },
+      { title: "Whisky Dreams", file: "Whisky Dreams.mp3" },
+      { title: "Magic Beers", file: "Magic Beers.mp3" },
+      { title: "Wine & Riffs", file: "Wine & Riffs.mp3" },
+      { title: "From the Barn to the Kettle", file: "From the Barn to the Kettle.mp3" },
+      { title: "(D)rum", file: "(D)rum.mp3" },
+      { title: "Winter Cheer", file: "Winter Cheer.mp3" },
+      { title: "Santa's Liquor Run", file: "Santa's Liquor Run.mp3" },
+      { title: "Christmas Waltz with You", file: "Christmas Waltz with You.mp3" }
+    ];
+    let currentTrack = 0;
+
+    const audioPlayer = document.getElementById('audio-player');
+    const trackTitle = document.getElementById('track-title');
+
+    function loadTrack(index) {
+      currentTrack = index;
+      trackTitle.textContent = tracks[index].title;
+      audioPlayer.src = tracks[index].file;
+      audioPlayer.play();
+    }
+
+    function playPrevious() {
+      if (currentTrack > 0) loadTrack(currentTrack - 1);
+    }
+
+    function playNext() {
+      if (currentTrack < tracks.length - 1) loadTrack(currentTrack + 1);
+    }
+
+    // Load the first track on page load
+    loadTrack(0);
+  </script>
+</body>
+</html>
