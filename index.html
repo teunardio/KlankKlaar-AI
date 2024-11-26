@@ -14,241 +14,219 @@
       margin: 0;
       padding: 0;
     }
-
-    .player-container {
-      max-width: 600px;
-      margin: 50px auto;
+    .container {
+      max-width: 600px; /* Restrict overall content width */
+      margin: 0 auto;
       padding: 20px;
-      background: #3e2723; /* Dark wood color */
-      border-radius: 15px;
-      box-shadow: 0 8px 15px rgba(0, 0, 0, 0.5);
-      text-align: center;
     }
-
-    .radio-display {
-      background: #212121; /* Radio screen color */
-      border: 5px solid #ffd700; /* Gold border */
-      border-radius: 10px;
-      padding: 10px;
-      margin-bottom: 20px;
-    }
-
-    .radio-display img {
-      max-width: 100%;
-      border-radius: 10px;
-    }
-
-    .track-info {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.2rem;
-      color: #ffd700; /* Gold text */
-      margin-top: 10px;
-    }
-
-    .controls {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
+    header {
       margin: 20px 0;
     }
-
-    .control-button {
-      background: #ffd700; /* Gold color */
-      border: 3px solid #3e2723;
-      border-radius: 50%;
-      width: 60px;
-      height: 60px;
-      font-size: 1.5rem;
+    header img {
+      max-width: 500px; /* Larger size for desktop */
+      width: 70%; /* Responsive scaling for smaller screens */
+    }
+    @media (max-width: 768px) {
+      header img {
+        max-width: 70%; /* 70% of screen width for mobile */
+      }
+    }
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      margin-bottom: 20px;
+    }
+    #track-title {
+      font-size: 1rem;
       font-weight: bold;
-      color: #3e2723;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      font-family: 'Lato', sans-serif;
+      margin-top: 10px;
+    }
+    #album-cover {
+      width: 100%;
+      max-width: 300px;
+      margin: 20px auto;
+      display: block;
+      border-radius: 10px;
+    }
+    audio {
+      width: 100%;
+      max-width: 450px; /* Restrict music player width */
+      margin-top: 20px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(145deg, #ffd700, #daa520); /* Gold gradient */
+      color: black;
+      font-weight: bold;
       cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
       transition: transform 0.2s, box-shadow 0.2s;
     }
-
-    .control-button:hover {
+    button:hover {
       transform: scale(1.1);
       box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
     }
-
-    .progress-bar-container {
-      margin: 10px auto;
-      width: 100%;
-      background: #ffd700; /* Gold track */
-      height: 10px;
-      border-radius: 5px;
-      overflow: hidden;
+    #info-text {
+      margin-top: 30px;
+      font-size: 1rem;
+      line-height: 1.5;
+      padding: 0 20px;
     }
-
-    .progress-bar {
-      width: 0;
-      height: 100%;
-      background: #3e2723; /* Dark wood color for progress */
-      transition: width 0.1s linear;
-    }
-
     .shuffle-toggle {
       font-size: 0.9rem;
+      cursor: pointer;
       margin-top: 10px;
       text-decoration: underline;
-      cursor: pointer;
-      color: #ffd700; /* Gold text */
     }
   </style>
 </head>
 <body>
-  <div class="player-container">
-    <div class="radio-display">
+  <div class="container">
+    <header>
+      <img src="logo.png" alt="Logo" id="logo">
+      <h1>Jouw intelligente muziekspeler</h1>
+    </header>
+    <div>
       <img src="cover.png" alt="Album Cover" id="album-cover">
+      <p id="track-title">No track playing</p>
+      <audio id="audio-player" controls></audio>
+      <div>
+        <button onclick="playPrevious()">Vorige</button>
+        <button onclick="playNext()">Volgende</button>
+      </div>
+      <p class="shuffle-toggle" onclick="toggleShuffle()">Shuffle: <span id="shuffle-status">Uit</span></p>
+      <p id="info-text">
+        Alsjeblieft Maarten,<br><br>
+        Jouw persoonlijke radiostation voor deze koude decembermaand. Wanneer je de muziek zat bent, neem dan contact op met ons, kunnen we kijken naar nieuwe songs.<br><br>
+        Fijne feestdagen!<br>
+        Cheers, Marit en Teunard
+      </p>
     </div>
-    <p class="track-info" id="track-title">No track playing</p>
-    <div class="controls">
-      <button class="control-button" onclick="playPrevious()">⏮</button>
-      <button class="control-button" onclick="togglePlayPause()">⏯</button>
-      <button class="control-button" onclick="playNext()">⏭</button>
-    </div>
-    <div class="progress-bar-container">
-      <div class="progress-bar" id="progress-bar"></div>
-    </div>
-    <p class="shuffle-toggle" onclick="toggleShuffle()">Shuffle: <span id="shuffle-status">Uit</span></p>
   </div>
+<script>
+  const tracks = [
+  { title: "Christmas Cheers (Raise Your Glass)", file: "Christmas Cheers (Raise Your Glass).mp3" },
+  { title: "Maarten's Christmas Lights", file: "Maarten's Christmas Lights.mp3" },
+  { title: "Christmas in Old Kampen", file: "Christmas in Old Kampen.mp3" },
+  { title: "Xmas at Slijterij Post", file: "Xmas at Slijterij Post.mp3" },
+  { title: "Winter Storms", file: "Winter Storms.mp3" },
+  { title: "Across the frozen IJssel", file: "Accross the frozen IJssel.mp3" },
+  { title: "Drunk at the Christmas Market", file: "Drunk at the Christmas Market.mp3" },
+  { title: "Whisky Dreams", file: "Whisky Dreams.mp3" },
+  { title: "Magic Beers", file: "Magic Beers.mp3" },
+  { title: "Wine & Riffs", file: "Wine & Riffs.mp3" },
+  { title: "From the Barn to the Kettle", file: "From the Barn to the Kettle.mp3" },
+  { title: "(D)rum", file: "(D)rum.mp3" },
+  { title: "Winter Cheer", file: "Winter Cheer.mp3" },
+  { title: "Santa's Liquor Run", file: "Santa's Liquor Run.mp3" },
+  { title: "Christmas Waltz with You", file: "Christmas Waltz with You.mp3" }
+];
 
-  <script>
-    const tracks = [
-      { title: "Christmas Cheers (Raise Your Glass)", file: "Christmas Cheers (Raise Your Glass).mp3" },
-      { title: "Maarten's Christmas Lights", file: "Maarten's Christmas Lights.mp3" },
-      { title: "Christmas in Old Kampen", file: "Christmas in Old Kampen.mp3" },
-      { title: "Xmas at Slijterij Post", file: "Xmas at Slijterij Post.mp3" },
-      { title: "Winter Storms", file: "Winter Storms.mp3" },
-      { title: "Across the frozen IJssel", file: "Accross the frozen IJssel.mp3" },
-      { title: "Drunk at the Christmas Market", file: "Drunk at the Christmas Market.mp3" },
-      { title: "Whisky Dreams", file: "Whisky Dreams.mp3" },
-      { title: "Magic Beers", file: "Magic Beers.mp3" },
-      { title: "Wine & Riffs", file: "Wine & Riffs.mp3" },
-      { title: "From the Barn to the Kettle", file: "From the Barn to the Kettle.mp3" },
-      { title: "(D)rum", file: "(D)rum.mp3" },
-      { title: "Winter Cheer", file: "Winter Cheer.mp3" },
-      { title: "Santa's Liquor Run", file: "Santa's Liquor Run.mp3" },
-      { title: "Christmas Waltz with You", file: "Christmas Waltz with You.mp3" }
-    ];
-  
-    let currentTrack = 0;
-    let shuffle = false;
-  
-    const audio = new Audio();
-    const trackTitle = document.getElementById('track-title');
-    const albumCover = document.getElementById('album-cover');
-    const progressBar = document.getElementById('progress-bar');
-    const shuffleStatus = document.getElementById('shuffle-status');
-    let fadeDuration = 5; // Duration of fade-in/out in seconds
-  
-    function updateMediaSessionMetadata(track) {
-      if ('mediaSession' in navigator) {
-        navigator.mediaSession.metadata = new MediaMetadata({
-          title: track.title,
-          artist: "KlankKlaar AI",
-          album: "Jouw persoonlijke radiostation",
-          artwork: [
-            { src: getAlbumArt(track), sizes: "300x300", type: "image/jpeg" },
-            { src: getAlbumArt(track), sizes: "512x512", type: "image/jpeg" }
-          ]
-        });
-        navigator.mediaSession.setActionHandler('play', () => audio.play());
-        navigator.mediaSession.setActionHandler('pause', () => audio.pause());
-        navigator.mediaSession.setActionHandler('previoustrack', playPrevious);
-        navigator.mediaSession.setActionHandler('nexttrack', playNext);
-      }
-    }
-  
-    function getAlbumArt(track) {
-      const jpegCover = track.file.replace('.mp3', '.jpeg');
-      return jpegCover;
-    }
-  
-    function loadTrack(index) {
-      const track = tracks[index];
-      currentTrack = index;
-      trackTitle.textContent = track.title;
-      audio.src = track.file;
-      albumCover.src = getAlbumArt(track);
-      albumCover.onerror = () => (albumCover.src = "cover.png");
-      updateMediaSessionMetadata(track);
-    }
-  
-    function fadeOut(callback) {
-      let volume = audio.volume;
-      const interval = 50; // 50ms for smooth fade
-      const step = volume / (fadeDuration * 1000 / interval); // Calculate step based on fade duration
-  
-      const fadeInterval = setInterval(() => {
-        if (volume > 0) {
-          volume -= step;
-          audio.volume = Math.max(volume, 0);
-        } else {
-          clearInterval(fadeInterval);
-          callback(); // Execute the callback (e.g., load the next track)
-        }
-      }, interval);
-    }
-  
-    function fadeIn() {
-      audio.volume = 0;
-      let volume = 0;
-      const interval = 50; // 50ms for smooth fade
-      const step = 1 / (fadeDuration * 1000 / interval); // Calculate step based on fade duration
-  
-      const fadeInterval = setInterval(() => {
-        if (volume < 1) {
-          volume += step;
-          audio.volume = Math.min(volume, 1);
-        } else {
-          clearInterval(fadeInterval);
-        }
-      }, interval);
-    }
-  
-    function playPrevious() {
-      fadeOut(() => {
-        currentTrack = (currentTrack - 1 + tracks.length) % tracks.length;
-        loadTrack(currentTrack);
-        audio.play();
-        fadeIn();
-      });
-    }
-  
-    function playNext() {
-      fadeOut(() => {
-        currentTrack = shuffle
-          ? Math.floor(Math.random() * tracks.length)
-          : (currentTrack + 1) % tracks.length;
-        loadTrack(currentTrack);
-        audio.play();
-        fadeIn();
-      });
-    }
-  
-    function togglePlayPause() {
-      if (audio.paused) {
-        audio.play();
-        fadeIn();
-      } else {
-        fadeOut(() => audio.pause());
-      }
-    }
-  
-    function toggleShuffle() {
-      shuffle = !shuffle;
-      shuffleStatus.textContent = shuffle ? "Aan" : "Uit";
-    }
-  
-    audio.addEventListener('timeupdate', () => {
-      const progress = (audio.currentTime / audio.duration) * 100;
-      progressBar.style.width = `${progress}%`;
+let currentTrack = 0;
+let shuffle = false;
+
+const audioPlayer = document.getElementById('audio-player');
+const trackTitle = document.getElementById('track-title');
+const albumCover = document.getElementById('album-cover');
+const shuffleStatus = document.getElementById('shuffle-status');
+
+// Function to get the album art for a given track
+function getAlbumArt(track) {
+  const jpegCover = track.file.replace('.mp3', '.jpeg');
+  return jpegCover; // By default, use the .jpeg with the same filename
+}
+
+// Update the page title dynamically
+function updatePageTitle(title) {
+  document.title = `${title} - KlankKlaar AI`;
+}
+
+// Update Media Session metadata for lock screen and control center
+if ('mediaSession' in navigator) {
+  function updateMediaSessionMetadata(track) {
+    const albumArt = getAlbumArt(track);
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: track.title,
+      artist: "KlankKlaar AI",
+      album: "Jouw persoonlijke radiostation",
+      artwork: [
+        { src: albumArt, sizes: "300x300", type: "image/jpeg" },
+        { src: albumArt, sizes: "512x512", type: "image/jpeg" }
+      ]
     });
-  
-    audio.addEventListener('ended', playNext);
-  
-    loadTrack(0);
-  </script>
+
+    // Set action handlers for media controls
+    navigator.mediaSession.setActionHandler('play', () => audioPlayer.play());
+    navigator.mediaSession.setActionHandler('pause', () => audioPlayer.pause());
+    navigator.mediaSession.setActionHandler('previoustrack', playPrevious);
+    navigator.mediaSession.setActionHandler('nexttrack', playNext);
+  }
+}
+
+// Load a track and update metadata
+function loadTrack(index) {
+  const current = tracks[index];
+  currentTrack = index;
+
+  // Update UI
+  trackTitle.textContent = current.title;
+  audioPlayer.src = current.file;
+
+  // Update album cover dynamically
+  const albumArt = getAlbumArt(current);
+  albumCover.src = albumArt;
+  albumCover.onerror = () => {
+    // Fallback to cover.png if album art is not available
+    albumCover.src = "cover.png";
+  };
+
+  updatePageTitle(current.title); // Update the page title
+  if ('mediaSession' in navigator) {
+    updateMediaSessionMetadata(current); // Update lock screen metadata
+  }
+  audioPlayer.play();
+}
+
+// Play the previous track
+function playPrevious() {
+  if (currentTrack > 0) {
+    loadTrack(currentTrack - 1);
+  } else {
+    loadTrack(tracks.length - 1); // Loop to the last track
+  }
+}
+
+// Play the next track
+function playNext() {
+  const nextTrack = shuffle
+    ? Math.floor(Math.random() * tracks.length)
+    : (currentTrack + 1) % tracks.length;
+  loadTrack(nextTrack);
+}
+
+// Toggle shuffle mode
+function toggleShuffle() {
+  shuffle = !shuffle;
+  shuffleStatus.textContent = shuffle ? "Aan" : "Uit";
+}
+
+// Automatically play the next track when the current one ends
+audioPlayer.addEventListener('ended', playNext);
+
+// Update track title on iPhone (or other devices) when the audio is loaded
+audioPlayer.addEventListener('canplay', () => {
+  const current = tracks[currentTrack];
+  trackTitle.textContent = current.title;
+  updatePageTitle(current.title); // Sync the page title with the current track
+});
+
+// Load the first track on page load
+loadTrack(0);
+</script>
 </body>
 </html>
