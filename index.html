@@ -14,6 +14,11 @@
       margin: 0;
       padding: 0;
     }
+    .container {
+      max-width: 600px; /* Restrict overall content width */
+      margin: 0 auto;
+      padding: 20px;
+    }
     header {
       margin: 20px 0;
     }
@@ -46,6 +51,7 @@
     }
     audio {
       width: 100%;
+      max-width: 450px; /* Restrict music player width */
       margin-top: 20px;
     }
     button {
@@ -80,25 +86,27 @@
   </style>
 </head>
 <body>
-  <header>
-    <img src="logo.png" alt="Logo" id="logo">
-    <h1>Jouw intelligente muziekspeler</h1>
-  </header>
-  <div>
-    <img src="cover.png" alt="Album Cover" id="album-cover">
-    <p id="track-title">No track playing</p>
-    <audio id="audio-player" controls></audio>
+  <div class="container">
+    <header>
+      <img src="logo.png" alt="Logo" id="logo">
+      <h1>Jouw intelligente muziekspeler</h1>
+    </header>
     <div>
-      <button onclick="playPrevious()">Vorige</button>
-      <button onclick="playNext()">Volgende</button>
+      <img src="cover.png" alt="Album Cover" id="album-cover">
+      <p id="track-title">No track playing</p>
+      <audio id="audio-player" controls></audio>
+      <div>
+        <button onclick="playPrevious()">Vorige</button>
+        <button onclick="playNext()">Volgende</button>
+      </div>
+      <p class="shuffle-toggle" onclick="toggleShuffle()">Shuffle: <span id="shuffle-status">Uit</span></p>
+      <p id="info-text">
+        Alsjeblieft Maarten,<br><br>
+        Jouw persoonlijke radiostation voor deze koude decembermaand. Wanneer je de muziek zat bent, neem dan contact op met ons, kunnen we kijken naar nieuwe songs.<br><br>
+        Fijne feestdagen!<br>
+        Cheers, Marit en Teunard
+      </p>
     </div>
-    <p class="shuffle-toggle" onclick="toggleShuffle()">Shuffle: <span id="shuffle-status">Uit</span></p>
-    <p id="info-text">
-      Alsjeblieft Maarten,<br><br>
-      Jouw persoonlijke radiostation voor deze koude decembermaand. Wanneer je de muziek zat bent, neem dan contact op met ons, kunnen we kijken naar nieuwe songs.<br><br>
-      Fijne feestdagen!<br>
-      Cheers, Marit en Teunard
-    </p>
   </div>
 
   <script>
