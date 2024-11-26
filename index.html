@@ -5,20 +5,79 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>KlankKlaar AI</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-    audio { width: 100%; margin-top: 20px; }
-    button { margin: 5px; padding: 10px 20px; font-size: 16px; }
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #6a0dad; /* Purple background */
+      color: white;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      margin: 20px 0;
+    }
+    header img {
+      max-width: 150px;
+    }
+    #player-container {
+      padding: 20px;
+      max-width: 600px;
+      margin: 0 auto;
+      border-radius: 20px;
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+    audio {
+      width: 100%;
+      margin: 20px 0;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 25px;
+      background: linear-gradient(145deg, #ffd700, #daa520); /* Gold gradient */
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    button:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 8px rgba(0, 0, 0, 0.3);
+    }
+    #track-title {
+      font-size: 1.5rem;
+      margin-top: 20px;
+    }
+    #info-text {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #ffd700; /* Gold text */
+    }
+    .shuffle-toggle {
+      font-size: 0.9rem;
+      cursor: pointer;
+      margin-top: 10px;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
-  <h1>KlankKlaar AI - Music Player</h1>
-  <div>
+  <header>
+    <img src="logo.png" alt="Logo" id="logo">
+    <h1>Jouw intelligente muziekspeler</h1>
+  </header>
+  <div id="player-container">
     <p id="track-title">No track playing</p>
     <audio id="audio-player" controls></audio>
     <div>
-      <button onclick="playPrevious()">Previous</button>
-      <button onclick="playNext()">Next</button>
+      <button onclick="playPrevious()">Vorige</button>
+      <button onclick="playNext()">Volgende</button>
     </div>
+    <p class="shuffle-toggle" onclick="toggleShuffle()">Shuffle: <span id="shuffle-status">Uit</span></p>
+    <p id="info-text">Geniet van je favoriete muziek deze feestdagen!</p>
   </div>
 
   <script>
@@ -40,9 +99,11 @@
       { title: "Christmas Waltz with You", file: "Christmas Waltz with You.mp3" }
     ];
     let currentTrack = 0;
+    let shuffle = false;
 
     const audioPlayer = document.getElementById('audio-player');
     const trackTitle = document.getElementById('track-title');
+    const shuffleStatus = document.getElementById('shuffle-status');
 
     function loadTrack(index) {
       currentTrack = index;
@@ -52,12 +113,36 @@
     }
 
     function playPrevious() {
-      if (currentTrack > 0) loadTrack(currentTrack - 1);
+      if (currentTrack > 0) {
+        loadTrack(currentTrack - 1);
+      } else {
+        loadTrack(tracks.length - 1); // Loop to the last track
+      }
     }
 
     function playNext() {
-      if (currentTrack < tracks.length - 1) loadTrack(currentTrack + 1);
+      if (shuffle) {
+        const randomIndex = Math.floor(Math.random() * tracks.length);
+        loadTrack(randomIndex);
+      } else if (currentTrack < tracks.length - 1) {
+        loadTrack(currentTrack + 1);
+      } else {
+        loadTrack(0); // Loop back to the first track
+      }
     }
+
+    function toggleShuffle() {
+      shuffle = !shuffle;
+      shuffleStatus.textContent = shuffle ? "Aan" : "Uit";
+    }
+
+    // Automatically play the next track when the current one ends
+    audioPlayer.addEventListener('ended', playNext);
+
+    // Update track title on iPhone (or other devices) when the audio is loaded
+    audioPlayer.addEventListener('canplay', () => {
+      trackTitle.textContent = tracks[currentTrack].title;
+    });
 
     // Load the first track on page load
     loadTrack(0);
