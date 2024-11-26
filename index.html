@@ -49,11 +49,6 @@
       display: block;
       border-radius: 10px;
     }
-    audio {
-      width: 100%;
-      max-width: 450px; /* Restrict music player width */
-      margin-top: 20px;
-    }
     button {
       margin: 10px;
       padding: 10px 20px;
@@ -94,7 +89,8 @@
     <div>
       <img src="cover.png" alt="Album Cover" id="album-cover">
       <p id="track-title">No track playing</p>
-      <audio id="audio-player" controls></audio>
+      <audio id="current-audio"></audio>
+      <audio id="next-audio"></audio>
       <div>
         <button onclick="playPrevious()">Vorige</button>
         <button onclick="playNext()">Volgende</button>
@@ -110,123 +106,91 @@
   </div>
 <script>
   const tracks = [
-  { title: "Christmas Cheers (Raise Your Glass)", file: "Christmas Cheers (Raise Your Glass).mp3" },
-  { title: "Maarten's Christmas Lights", file: "Maarten's Christmas Lights.mp3" },
-  { title: "Christmas in Old Kampen", file: "Christmas in Old Kampen.mp3" },
-  { title: "Xmas at Slijterij Post", file: "Xmas at Slijterij Post.mp3" },
-  { title: "Winter Storms", file: "Winter Storms.mp3" },
-  { title: "Across the frozen IJssel", file: "Accross the frozen IJssel.mp3" },
-  { title: "Drunk at the Christmas Market", file: "Drunk at the Christmas Market.mp3" },
-  { title: "Whisky Dreams", file: "Whisky Dreams.mp3" },
-  { title: "Magic Beers", file: "Magic Beers.mp3" },
-  { title: "Wine & Riffs", file: "Wine & Riffs.mp3" },
-  { title: "From the Barn to the Kettle", file: "From the Barn to the Kettle.mp3" },
-  { title: "(D)rum", file: "(D)rum.mp3" },
-  { title: "Winter Cheer", file: "Winter Cheer.mp3" },
-  { title: "Santa's Liquor Run", file: "Santa's Liquor Run.mp3" },
-  { title: "Christmas Waltz with You", file: "Christmas Waltz with You.mp3" }
-];
+    { title: "Christmas Cheers (Raise Your Glass)", file: "Christmas Cheers (Raise Your Glass).mp3" },
+    { title: "Maarten's Christmas Lights", file: "Maarten's Christmas Lights.mp3" },
+    { title: "Christmas in Old Kampen", file: "Christmas in Old Kampen.mp3" },
+    // Add more tracks as needed
+  ];
 
-let currentTrack = 0;
-let shuffle = false;
+  let currentTrackIndex = 0;
+  let shuffle = false;
+  const crossfadeDuration = 3000; // 3 seconds
 
-const audioPlayer = document.getElementById('audio-player');
-const trackTitle = document.getElementById('track-title');
-const albumCover = document.getElementById('album-cover');
-const shuffleStatus = document.getElementById('shuffle-status');
+  const currentAudio = document.getElementById('current-audio');
+  const nextAudio = document.getElementById('next-audio');
+  const trackTitle = document.getElementById('track-title');
+  const albumCover = document.getElementById('album-cover');
+  const shuffleStatus = document.getElementById('shuffle-status');
 
-// Function to get the album art for a given track
-function getAlbumArt(track) {
-  const jpegCover = track.file.replace('.mp3', '.jpeg');
-  return jpegCover; // By default, use the .jpeg with the same filename
-}
+  function getAlbumArt(track) {
+    return track.file.replace('.mp3', '.jpeg');
+  }
 
-// Update the page title dynamically
-function updatePageTitle(title) {
-  document.title = `${title} - KlankKlaar AI`;
-}
-
-// Update Media Session metadata for lock screen and control center
-if ('mediaSession' in navigator) {
-  function updateMediaSessionMetadata(track) {
+  function updateUI(track) {
+    trackTitle.textContent = track.title;
     const albumArt = getAlbumArt(track);
-    navigator.mediaSession.metadata = new MediaMetadata({
-      title: track.title,
-      artist: "KlankKlaar AI",
-      album: "Jouw persoonlijke radiostation",
-      artwork: [
-        { src: albumArt, sizes: "300x300", type: "image/jpeg" },
-        { src: albumArt, sizes: "512x512", type: "image/jpeg" }
-      ]
-    });
-
-    // Set action handlers for media controls
-    navigator.mediaSession.setActionHandler('play', () => audioPlayer.play());
-    navigator.mediaSession.setActionHandler('pause', () => audioPlayer.pause());
-    navigator.mediaSession.setActionHandler('previoustrack', playPrevious);
-    navigator.mediaSession.setActionHandler('nexttrack', playNext);
+    albumCover.src = albumArt;
+    albumCover.onerror = () => (albumCover.src = 'cover.png');
   }
-}
 
-// Load a track and update metadata
-function loadTrack(index) {
-  const current = tracks[index];
-  currentTrack = index;
-
-  // Update UI
-  trackTitle.textContent = current.title;
-  audioPlayer.src = current.file;
-
-  // Update album cover dynamically
-  const albumArt = getAlbumArt(current);
-  albumCover.src = albumArt;
-  albumCover.onerror = () => {
-    // Fallback to cover.png if album art is not available
-    albumCover.src = "cover.png";
-  };
-
-  updatePageTitle(current.title); // Update the page title
-  if ('mediaSession' in navigator) {
-    updateMediaSessionMetadata(current); // Update lock screen metadata
+  function loadTrack(audioElement, trackIndex) {
+    const track = tracks[trackIndex];
+    audioElement.src = track.file;
+    audioElement.load();
+    if (audioElement === currentAudio) updateUI(track);
   }
-  audioPlayer.play();
-}
 
-// Play the previous track
-function playPrevious() {
-  if (currentTrack > 0) {
-    loadTrack(currentTrack - 1);
-  } else {
-    loadTrack(tracks.length - 1); // Loop to the last track
+  function playWithCrossfade(nextTrackIndex) {
+    const outgoing = currentAudio;
+    const incoming = nextAudio;
+
+    loadTrack(incoming, nextTrackIndex);
+
+    incoming.volume = 0;
+    incoming.play();
+
+    let progress = 0;
+    const interval = 50; // Adjust interval for smoother transitions
+    const step = 1 / (crossfadeDuration / interval);
+
+    const crossfade = setInterval(() => {
+      progress += step;
+      outgoing.volume = Math.max(0, 1 - progress);
+      incoming.volume = Math.min(1, progress);
+
+      if (progress >= 1) {
+        clearInterval(crossfade);
+        outgoing.pause();
+        outgoing.src = '';
+      }
+    }, interval);
+
+    [currentAudio, nextAudio] = [incoming, outgoing];
+    currentTrackIndex = nextTrackIndex;
   }
-}
 
-// Play the next track
-function playNext() {
-  const nextTrack = shuffle
-    ? Math.floor(Math.random() * tracks.length)
-    : (currentTrack + 1) % tracks.length;
-  loadTrack(nextTrack);
-}
+  function playNext() {
+    const nextIndex = shuffle
+      ? Math.floor(Math.random() * tracks.length)
+      : (currentTrackIndex + 1) % tracks.length;
+    playWithCrossfade(nextIndex);
+  }
 
-// Toggle shuffle mode
-function toggleShuffle() {
-  shuffle = !shuffle;
-  shuffleStatus.textContent = shuffle ? "Aan" : "Uit";
-}
+  function playPrevious() {
+    const previousIndex =
+      currentTrackIndex === 0 ? tracks.length - 1 : currentTrackIndex - 1;
+    playWithCrossfade(previousIndex);
+  }
 
-// Automatically play the next track when the current one ends
-audioPlayer.addEventListener('ended', playNext);
+  function toggleShuffle() {
+    shuffle = !shuffle;
+    shuffleStatus.textContent = shuffle ? 'Aan' : 'Uit';
+  }
 
-// Update track title on iPhone (or other devices) when the audio is loaded
-audioPlayer.addEventListener('canplay', () => {
-  const current = tracks[currentTrack];
-  trackTitle.textContent = current.title;
-  updatePageTitle(current.title); // Sync the page title with the current track
-});
-
-// Load the first track on page load
-loadTrack(0);
+  currentAudio.addEventListener('ended', playNext);
+  loadTrack(currentAudio, currentTrackIndex);
+  currentAudio.volume = 1;
+  currentAudio.play();
 </script>
 </body>
 </html>
